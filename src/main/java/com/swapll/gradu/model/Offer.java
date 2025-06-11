@@ -46,9 +46,8 @@ public class  Offer {
     @NotNull
     private int price;
 
-    @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
-    private byte[] image;
+    @Column(name = "image", columnDefinition = "TEXT")
+    private String image;
 
     @Column(name = "delivery_time")
 

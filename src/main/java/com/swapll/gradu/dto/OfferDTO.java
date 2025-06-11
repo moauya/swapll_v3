@@ -31,7 +31,7 @@ public class    OfferDTO {
     private int numberOfReviews;
     //user info
     private String username;
-    private byte[]  profilePic;
+    private String profilePic;
     //category info
     private int categoryId;
 

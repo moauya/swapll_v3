@@ -53,9 +53,8 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @Lob
-    @Column(name = "profile_pic", columnDefinition = "LONGBLOB")
-    private byte[] profilePic;
+    @Column(name = "profile_pic", columnDefinition = "TEXT")
+    private String profilePic;
 
     @Column(name = "my_referral_code")
     private String myReferralCode;

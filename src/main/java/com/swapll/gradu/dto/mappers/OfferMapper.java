@@ -23,9 +23,7 @@ public class OfferMapper {
         dto.setOwnerId(offer.getOwner().getId());
         dto.setCreatedAt(offer.getCreatedAt());
 
-        if (offer.getId() != null && offer.getImage() != null) {
-            dto.setImage("/api/offers/" + offer.getId() + "/image");
-        }
+        dto.setImage(offer.getImage());
 
         if (offer.getOwner() != null) {
             dto.setUsername(offer.getOwner().getUserName());

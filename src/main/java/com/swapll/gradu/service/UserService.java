@@ -34,6 +34,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private S3Service s3Service;
+
 
     public UserDTO registerUser(UserDTO userDTO, MultipartFile profilePic) {
         if (userRepository.existsByUserNameIgnoreCase(userDTO.getUserName())) {
@@ -47,20 +50,22 @@ public class UserService {
         User user = UserMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
+        // ✅ Upload profile picture to S3
         if (profilePic != null && !profilePic.isEmpty()) {
-            try {
-                user.setProfilePic(profilePic.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to process profile picture", e);
-            }
+            String fileName = "profile-pictures/" + UUID.randomUUID() + "-" + profilePic.getOriginalFilename();
+            String s3Url = s3Service.uploadFile(profilePic, fileName);
+            user.setProfilePic(s3Url); // ✅ Save S3 URL
         }
 
+        // ✅ Referral logic stays the same
         if (userDTO.getReferralCode() != null &&
                 userRepository.existsByMyReferralCodeIgnoreCase(userDTO.getReferralCode())) {
 
             user.setBalance(user.getBalance() + 10);
+
             User referrer = userRepository.findByMyReferralCodeIgnoreCase(userDTO.getReferralCode())
                     .orElseThrow(() -> new RuntimeException("Referral code not found"));
+
             referrer.setBalance(referrer.getBalance() + 3);
             userRepository.save(referrer);
         } else {
@@ -70,6 +75,7 @@ public class UserService {
         userRepository.save(user);
         return UserMapper.toDTO(user);
     }
+
 
 
     @Transactional
@@ -101,17 +107,17 @@ public class UserService {
         if (updatedUserDTO.getReferralCode() != null) owner.setReferralCode(updatedUserDTO.getReferralCode());
         if (updatedUserDTO.getBio() != null) owner.setBio(updatedUserDTO.getBio());
 
+        // ✅ Upload new profile picture to S3 and update URL
         if (profilePic != null && !profilePic.isEmpty()) {
-            try {
-                owner.setProfilePic(profilePic.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to update profile picture", e);
-            }
+            String fileName = "profile-pictures/" + UUID.randomUUID() + "-" + profilePic.getOriginalFilename();
+            String s3Url = s3Service.uploadFile(profilePic, fileName);
+            owner.setProfilePic(s3Url); // Save the new S3 URL
         }
 
         User updatedOwner = userRepository.save(owner);
         return UserMapper.toDTO(updatedOwner);
     }
+
 
 
     public User getUserByEmailOrUsername(String username) {
@@ -148,12 +154,7 @@ public class UserService {
         return dto;
     }
 
-    public byte[] getUserProfilePic(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return user.getProfilePic();
-    }
 
     public String getUserNameByRefCode(String refCode){
         Optional<User> user=userRepository.findByMyReferralCodeIgnoreCase(refCode);

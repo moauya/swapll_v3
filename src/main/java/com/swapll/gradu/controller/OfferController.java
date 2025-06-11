@@ -59,14 +59,7 @@ public class OfferController {
         return ResponseEntity.ok(updatedOffer);
     }
 
-    @GetMapping("/offers/{id}/image")
-    public ResponseEntity<byte[]> getOfferImage(@PathVariable int id) {
-        byte[] imageData = offerService.getOfferImage(id);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
-    }
 
 
 

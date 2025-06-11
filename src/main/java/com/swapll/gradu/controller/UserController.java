@@ -59,17 +59,7 @@ public class UserController {
         return  userService.getUserInfo();
      }
 
-     @GetMapping("/users/{id}/profile-pic")
-     public ResponseEntity<byte[]> getProfilePic(@PathVariable Integer id){
-          byte[] image = userService.getUserProfilePic(id);
-          if (image == null || image.length == 0) {
-               return ResponseEntity.notFound().build();
-          }
 
-          return ResponseEntity.ok()
-                  .contentType(MediaType.IMAGE_JPEG)
-                  .body(image);
-     }
      @GetMapping("/user/ref/{refCode}")
      public String getUserNameByRefCode(@PathVariable String refCode){
 

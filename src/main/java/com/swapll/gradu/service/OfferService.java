@@ -32,6 +32,9 @@ public class OfferService {
     @Autowired
     private OfferRepository offerRepository;
 
+    @Autowired
+    private S3Service s3Service;
+
 
     @Autowired
     public OfferService(OfferRepository repo) {
@@ -54,13 +57,15 @@ public class OfferService {
         category.addOffer(offer);
 
         if (image != null && !image.isEmpty()) {
-            offer.setImage(image.getBytes());  //
+            String fileName = "offer-images/" + UUID.randomUUID() + "-" + image.getOriginalFilename();
+            String s3Url = s3Service.uploadFile(image, fileName);
+            offer.setImage(s3Url);  // ✅ Store the S3 URL instead of byte[]
         }
 
         offerRepository.save(offer);
-
         return OfferMapper.toDTO(offer);
     }
+
 
 
     public List<OfferDTO> getAllOffersByCategoryId(int categoryId) {
@@ -104,17 +109,12 @@ public class OfferService {
             throw new SecurityException("You are not authorized to update this offer");
         }
 
-        if (dto.getTitle() != null)
-            offer.setTitle(dto.getTitle());
-        if (dto.getDescription() != null)
-            offer.setDescription(dto.getDescription());
-        if (dto.getPrice() != 0)
-            offer.setPrice(dto.getPrice()*3);
-        if (dto.getDeliveryTime() != 0)
-            offer.setDeliveryTime(dto.getDeliveryTime());
-        if (dto.getPaymentMethod() != null)
-            offer.setPaymentMethod(dto.getPaymentMethod());
-
+        if (dto.getTitle() != null) offer.setTitle(dto.getTitle());
+        if (dto.getDescription() != null) offer.setDescription(dto.getDescription());
+        if (dto.getPrice() != 0) offer.setPrice(dto.getPrice() * 3);
+        if (dto.getDeliveryTime() != 0) offer.setDeliveryTime(dto.getDeliveryTime());
+        if (dto.getPaymentMethod() != null) offer.setPaymentMethod(dto.getPaymentMethod());
+        if (dto.getType() != null) offer.setType(dto.getType());
 
         if (dto.getCategoryId() != 0) {
             Category category = categoryRepository.findById(dto.getCategoryId())
@@ -123,24 +123,14 @@ public class OfferService {
         }
 
         if (image != null && !image.isEmpty()) {
-            offer.setImage(image.getBytes());
+            String fileName = "offer-images/" + UUID.randomUUID() + "-" + image.getOriginalFilename();
+            String s3Url = s3Service.uploadFile(image, fileName);
+            offer.setImage(s3Url); // ✅ New image URL
         }
-
-        offer.setType(dto.getType());
 
         return OfferMapper.toDTO(offerRepository.save(offer));
     }
 
-    public byte[] getOfferImage(int offerId) {
-        Offer offer = offerRepository.findById(offerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Offer not found"));
-
-        if (offer.getImage() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found");
-        }
-
-        return offer.getImage();
-    }
 
 
 
