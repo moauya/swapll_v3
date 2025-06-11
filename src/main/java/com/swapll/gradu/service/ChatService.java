@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -73,15 +72,11 @@ public class ChatService {
             dto.setChatId(chat.getId());
             dto.setOtherUserId(other.getId());
             dto.setOtherUsername(other.getUserName());
-            dto.setOtherPicture(other.getProfilePic());
+            dto.setOtherPicture(other.getProfilePic()); // Assuming it's already a URL or encoded string
             dto.setLastMessage(last != null ? last.getContent() : null);
             dto.setLastMessageTime(last != null ? last.getTimestamp().toString() : null);
             return dto;
         }).collect(Collectors.toList());
-    }
-
-    public ChatSummaryDTO getOrCreateChatWithUser(int receiverId) {
-        throw new UnsupportedOperationException("This method must be implemented based on your auth context.");
     }
 
     public ChatSummaryDTO getChatSummary(Chat chat, int currentUserId) {
