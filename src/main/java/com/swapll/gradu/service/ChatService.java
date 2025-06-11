@@ -73,7 +73,7 @@ public class ChatService {
             dto.setChatId(chat.getId());
             dto.setOtherUserId(other.getId());
             dto.setOtherUsername(other.getUserName());
-            dto.setOtherPicture(Arrays.toString(other.getProfilePic()));
+            dto.setOtherPicture(other.getProfilePic());
             dto.setLastMessage(last != null ? last.getContent() : null);
             dto.setLastMessageTime(last != null ? last.getTimestamp().toString() : null);
             return dto;
@@ -95,7 +95,7 @@ public class ChatService {
         dto.setChatId(chat.getId());
         dto.setOtherUserId(other.getId());
         dto.setOtherUsername(other.getUserName());
-        dto.setOtherPicture(Arrays.toString(other.getProfilePic()));
+        dto.setOtherPicture(other.getProfilePic());
         dto.setLastMessage(last != null ? last.getContent() : null);
         dto.setLastMessageTime(last != null ? last.getTimestamp().toString() : null);
 

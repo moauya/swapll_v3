@@ -22,7 +22,7 @@ public class ReviewDTO {
     private String firstName;
     private String lastName;
     private String userName;
-    private byte[] profilePicture;
+    private String profilePicture;
 
 
     private int userId;
